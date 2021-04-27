@@ -118,8 +118,9 @@ resource "aws_route_table_association" "private" {
 }
 
 /*====
-VPC's Default Security Group
+VPCs Default Security Group
 ======*/
+
 resource "aws_security_group" "default" {
   name        = "${var.environment}-default-sg"
   description = "Default security group to allow inbound/outbound from the VPC"
@@ -137,7 +138,7 @@ resource "aws_security_group" "default" {
     from_port = "0"
     to_port   = "0"
     protocol  = "-1"
-    self      = "true"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -145,3 +146,11 @@ resource "aws_security_group" "default" {
   }
 }
 
+resource "aws_security_group_rule" "allowport80" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.default.id}"
+}

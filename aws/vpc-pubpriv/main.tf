@@ -161,10 +161,11 @@ resource "aws_instance" "webserver_private" {
   ami           = "ami-038f1ca1bd58a5790"
   instance_type = "t2.micro"
   vpc_security_group_ids = [aws_security_group.default.id]
-  subnet_id = "${element(aws_subnet.public_subnet.*.id, 1)}"
-
+  subnet_id = "${element(aws_subnet.private_subnet.*.id, 1)}"
+  associate_public_ip_address = "false"
+  
   tags = {
-    Name = "WebServer1_Public"
+    Name = "WebServer1_Private"
   }
 }
 
@@ -172,7 +173,7 @@ resource "aws_instance" "webserver_public" {
   ami           = "ami-038f1ca1bd58a5790"
   instance_type = "t2.micro"
   vpc_security_group_ids = [aws_security_group.default.id]
-  subnet_id = "${element(aws_subnet.private_subnet.*.id, 1)}"
+  subnet_id = "${element(aws_subnet.public_subnet.*.id, 1)}"
   associate_public_ip_address = "true"
 
   tags = {

@@ -155,6 +155,38 @@ resource "aws_security_group_rule" "allowport80" {
 }
 
 /*====
+IAM Role for EC2
+======*/
+resource "aws_iam_role" "ssmcore_role" {
+  name = "ssmcore_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      },
+    ]
+  })
+  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
+
+  tags = {
+    tag-key = "tag-value"
+  }
+}
+
+resource "aws_iam_instance_profile" "ssmcore_instanceprofile" {
+  name = "ssmcore_instanceprofile"
+  role = "${aws_iam_role.ssmcore_role.name}"
+}
+
+
+/*====
 EC2 Instances
 ======*/
 resource "aws_instance" "webserver_private" {
@@ -163,7 +195,8 @@ resource "aws_instance" "webserver_private" {
   vpc_security_group_ids = [aws_security_group.default.id]
   subnet_id = "${element(aws_subnet.private_subnet.*.id, 1)}"
   associate_public_ip_address = "false"
-  
+  iam_instance_profile = "${aws_iam_instance_profile.ssmcore_instanceprofile.name}"
+
   tags = {
     Name = "WebServer1_Private"
   }
@@ -175,8 +208,10 @@ resource "aws_instance" "webserver_public" {
   vpc_security_group_ids = [aws_security_group.default.id]
   subnet_id = "${element(aws_subnet.public_subnet.*.id, 1)}"
   associate_public_ip_address = "true"
+  iam_instance_profile = "${aws_iam_instance_profile.ssmcore_instanceprofile.name}"
 
   tags = {
     Name = "WebServer1_Public"
   }
 }
+

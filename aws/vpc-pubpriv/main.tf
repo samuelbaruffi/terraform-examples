@@ -120,7 +120,6 @@ resource "aws_route_table_association" "private" {
 /*====
 VPCs Default Security Group
 ======*/
-
 resource "aws_security_group" "default" {
   name        = "${var.environment}-default-sg"
   description = "Default security group to allow inbound/outbound from the VPC"
@@ -153,4 +152,30 @@ resource "aws_security_group_rule" "allowport80" {
   protocol          = "tcp"
   cidr_blocks       = ["0.0.0.0/0"]
   security_group_id = "${aws_security_group.default.id}"
+}
+
+/*====
+EC2 Instances
+======*/
+resource "aws_instance" "webserver_private" {
+  ami           = "ami-038f1ca1bd58a5790"
+  instance_type = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.default.id]
+  subnet_id = "${element(aws_subnet.public_subnet.*.id, 1)}"
+
+  tags = {
+    Name = "WebServer1_Public"
+  }
+}
+
+resource "aws_instance" "webserver_public" {
+  ami           = "ami-038f1ca1bd58a5790"
+  instance_type = "t2.micro"
+  vpc_security_group_ids = [aws_security_group.default.id]
+  subnet_id = "${element(aws_subnet.private_subnet.*.id, 1)}"
+  associate_public_ip_address = "true"
+
+  tags = {
+    Name = "WebServer1_Public"
+  }
 }

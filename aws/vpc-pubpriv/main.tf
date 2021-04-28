@@ -198,7 +198,7 @@ resource "aws_instance" "database_private" {
   iam_instance_profile = "${aws_iam_instance_profile.ssmcore_instanceprofile.name}"
 
   tags = {
-    Name = "Database1_Private"
+    Name = "Terraform-Database1_Private"
   }
 }
 
@@ -211,7 +211,7 @@ resource "aws_instance" "webserver_public" {
   iam_instance_profile = "${aws_iam_instance_profile.ssmcore_instanceprofile.name}"
 
   tags = {
-    Name = "WebServer1_Public"
+    Name = "Terraform-WebServer1_Public"
   }
 }
 

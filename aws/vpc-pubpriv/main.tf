@@ -189,7 +189,7 @@ resource "aws_iam_instance_profile" "ssmcore_instanceprofile" {
 /*====
 EC2 Instances
 ======*/
-resource "aws_instance" "webserver_private" {
+resource "aws_instance" "database_private" {
   ami           = "ami-038f1ca1bd58a5790"
   instance_type = "t2.micro"
   vpc_security_group_ids = [aws_security_group.default.id]
@@ -198,7 +198,7 @@ resource "aws_instance" "webserver_private" {
   iam_instance_profile = "${aws_iam_instance_profile.ssmcore_instanceprofile.name}"
 
   tags = {
-    Name = "WebServer1_Private"
+    Name = "Database1_Private"
   }
 }
 

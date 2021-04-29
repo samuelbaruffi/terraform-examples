@@ -208,7 +208,7 @@ resource "aws_security_group_rule" "allowport3306" {
   from_port         = 3306
   to_port           = 3306
   protocol          = "tcp"
-  cidr_blocks       = ["0.0.0.0/0"]
+  source_security_group_id = "${aws_security_group.default.id}"
   security_group_id = "${aws_security_group.database.id}"
 }
 

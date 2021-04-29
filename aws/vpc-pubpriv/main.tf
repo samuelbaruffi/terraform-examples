@@ -178,6 +178,40 @@ resource "aws_security_group_rule" "allowport80" {
   security_group_id = "${aws_security_group.default.id}"
 }
 
+resource "aws_security_group" "database" {
+  name        = "${var.environment}-database-sg"
+  description = "Database security group to allow inbound traffic on port 3306 MySQL"
+  vpc_id      = "${aws_vpc.vpc.id}"
+  depends_on  = [aws_vpc.vpc]
+
+  ingress {
+    from_port = "0"
+    to_port   = "0"
+    protocol  = "-1"
+    self      = true
+  }
+
+  egress {
+    from_port = "0"
+    to_port   = "0"
+    protocol  = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Environment = "${var.environment}"
+  }
+}
+
+resource "aws_security_group_rule" "allowport3306" {
+  type              = "ingress"
+  from_port         = 3306
+  to_port           = 3306
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = "${aws_security_group.database.id}"
+}
+
 /*====
 IAM Role for EC2
 ======*/
@@ -216,7 +250,7 @@ EC2 Instances
 resource "aws_instance" "database_private" {
   ami           = "ami-038f1ca1bd58a5790"
   instance_type = "t2.micro"
-  vpc_security_group_ids = [aws_security_group.default.id]
+  vpc_security_group_ids = [aws_security_group.database.id]
   subnet_id = "${element(aws_subnet.private_subnet.*.id, 1)}"
   associate_public_ip_address = "false"
   iam_instance_profile = "${aws_iam_instance_profile.ssmcore_instanceprofile.name}"

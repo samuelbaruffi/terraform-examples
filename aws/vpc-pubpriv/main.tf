@@ -1,3 +1,27 @@
+locals {
+  instance-userdata-webserver = <<EOF
+ #!/bin/bash
+yum -y update
+
+# install nginx
+amazon-linux-extras install nginx1 -y
+
+# start server
+service nginx start       
+EOF
+ 
+ instance-userdata-database = <<EOF
+#!/bin/bash
+
+# Update all packages
+yum -y update
+
+# Install mysql client 
+yum -y install mysql       
+EOF
+}
+
+
 /*====
 The VPC
 ======*/
@@ -196,6 +220,7 @@ resource "aws_instance" "database_private" {
   subnet_id = "${element(aws_subnet.private_subnet.*.id, 1)}"
   associate_public_ip_address = "false"
   iam_instance_profile = "${aws_iam_instance_profile.ssmcore_instanceprofile.name}"
+  user_data_base64 = "${base64encode(local.instance-userdata-webserver)}"
 
   tags = {
     Name = "Terraform-Database1_Private"
@@ -209,6 +234,7 @@ resource "aws_instance" "webserver_public" {
   subnet_id = "${element(aws_subnet.public_subnet.*.id, 1)}"
   associate_public_ip_address = "true"
   iam_instance_profile = "${aws_iam_instance_profile.ssmcore_instanceprofile.name}"
+  user_data_base64 = "${base64encode(local.instance-userdata-database)}"
 
   tags = {
     Name = "Terraform-WebServer1_Public"

@@ -1,7 +1,7 @@
 variable "environment" {
   description = "The Deployment environment"
   type = string
-  default = "dev"
+  default = "pubpriv-cfn"
 }
 
 variable "vpc_cidr" {

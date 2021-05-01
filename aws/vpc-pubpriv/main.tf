@@ -32,7 +32,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_support   = true
 
   tags = {
-    Name        = "${var.environment}-vpc"
+    Name        = "vpc-${var.environment}"
     Environment = "${var.environment}"
   }
 }

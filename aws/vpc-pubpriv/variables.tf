@@ -1,7 +1,7 @@
 variable "environment" {
   description = "The Deployment environment"
   type = string
-  default = "pubpriv-cfn"
+  default = "pubpriv-terraform"
 }
 
 variable "vpc_cidr" {

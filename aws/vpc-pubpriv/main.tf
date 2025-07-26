@@ -52,7 +52,6 @@ resource "aws_internet_gateway" "ig" {
 
 /* Elastic IP for NAT */
 resource "aws_eip" "nat_eip" {
-  vpc        = true
   depends_on = [aws_internet_gateway.ig]
 }
 
@@ -231,11 +230,15 @@ resource "aws_iam_role" "ssmcore_role" {
       },
     ]
   })
-  managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
 
   tags = {
     tag-key = "tag-value"
   }
+}
+
+resource "aws_iam_role_policy_attachment" "ssmcore_managed" {
+  role       = aws_iam_role.ssmcore_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 resource "aws_iam_instance_profile" "ssmcore_instanceprofile" {
